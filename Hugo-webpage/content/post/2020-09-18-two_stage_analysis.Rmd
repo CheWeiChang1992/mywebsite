@@ -1,0 +1,229 @@
+---
+title: "Two-stage analysis to compute BLUEs and BLUPs"
+author: "Che-Wei Chang"
+date: "2020-09-18"
+output: html_document
+bibliography: bib/ref.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Why we use two-stage analysis?
+In plant breeding program, candidate genotypes may be tested in multiple environments, e.g. locations and years, to reliably evaluate quantitative traits. Data obtained from multi-environmental trials (MET) is typically analyzed by using mixed models that provide best linear unbiased estimators (BLUEs) and best linear unbiased predictors (BLUPs).  
+  
+A standard approach to analyze MET data is by fitting all fixed and random effect with one stage, called single stage analysis. However, single-stage analysis is computationally inefficient, which requires considerable computational time and memory when the number of genotypes and environments is huge [@mohring2009comparison; @piepho2012stage]. This disadvantage of single-stage analysis is especially problematic if users need to perform cross-validation [@piepho2012stage].  
+
+## General method of two-stage analysis
+In two-stage analysis, we estimate adjusted or generalized least squares estimates of genotypic means within environments (trials) in the first stage. Then, we compute marginal means of genotypes across environments (trials) based on the adjusted means obtained in the first stage [@mohring2009comparison].  
+According to @piepho2012stage, we can write a following model:  
+$y_j = X_{b(j)}\beta_b+Z_{b(j)}u_{b(j)}+Z_{w(j)}u_{w(j)}+e_{w(j)}$  
+  
+where $y_j$ represents the observed data in the j-th environment, $X_{b(j)}, Z_{b(j)}, Z_{w(j)}$ are the design matrices of the j-th environment; $\beta_b$ is the fixed effect between environments, including genotype main effects; $u_{b(j)}$ is the random between-environment effects for j-th ennvironment; $u_{w(j)}$ is the random within-environment effects for j-th ennvironment; $e_{w(j)}$ is the error in the j-th environment.  
+  
+We can combine the within-environment effects in the model above as $f_{w(j)}$:  
+$y_j = X_{b(j)}\beta_b+Z_{b(j)}u_{b(j)}+f_{w(j)}$  
+  
+To perform two-stage analysis, we further split the model into two parts:  
+- model for the first stage: $y_j = X_{1(j)}\eta_{1(j)}+f_{w(j)}$    
+- model for the second stage: $\eta_{1(j)}=X_{2(j)}\beta_b+Z_{2(j)}u_{b(j)}$  
+And two models can be combined as $y_j=X_{1(j)}X_{2(j)}\beta_b+X_{1(j)}Z_{2(j)}u_{b(j)}+f_{w(j)}$  
+
+We should note that in the first stage, effects of genotypes are recommended being fitted as fixed effect to avoid double shrinkage [@smith2001; @piepho2012stage].  
+
+## Weighting in the second stage
+A main problem with two-stage analysis is **the heterogeneity of error variance between trials (variance-covariance structure of adjusted means)**. @smith2001 proposed a weighting scheme (Smith's weighting) to account for the heterogeneity by using $\Pi=diag(\pi_{ij})$ where $\pi_{ij}=\tilde{\sigma}^2\tilde{\sigma}_{jii}^{-1}$; $\tilde{\sigma}_{jii}$ is the diagnal element of $\tilde{\Sigma}_j$; $i$ represents i-th genotype and $j$ represents j-th trial [see the section 3.4 in @smith2001 for details].  
+  
+@mohring2009comparison further proposed several weighting methods and compared them by using single-stage analysis as benchmark. @mohring2009comparison suggested that the weighting methods are superior than unweighted method, but the performance of weighting methods depends on datasets [@mohring2009comparison]. However, @mohring2009comparison also concluded that the difference between weighting methods is small, so weighting methods can be chosen according to computational convenience.  
+  
+  
+## Example: using ASReml-r
+@buntarancross provide the R scripts and data used in their study. The two-stage analysis is performed by using ASReml-r. You will find the R script for single-stage analysis and two-stage analysis with three different weighting methods. [Here is the link to download the files](https://acsess.onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1002%2Fcsc2.20177&file=csc220177-sup-0001-data.zip).  
+  
+### Example in R: Smith's weighting
+Here we look at the example R code from @buntarancross. We select the Smith's weighting method [@smith2001] as an example. Smith's weighting method is one of the weighting based on a diagonal matrix, which makes the computation in the second stage be very fast [@mohring2009comparison].  
+
+#### 1. prepare data for ASReml
+```{r, eval=FALSE, include=TRUE}
+######################################
+##### Two Stage Smith Weigthing #####
+####################################
+setwd("/home/cheweichang/Downloads/example_two-stage_analysis/")
+# R setup ###########
+require(data.table) # data.table instead of data.frame format for coding efficiency
+require(plyr)       # plyr::ldply() to collapse list after 1st stage
+require(asreml)     # Fit model with ASReml-R 4
+require(stringr)    # Split the character to provide factor's name
+#####################
+
+options("scipen"=100,"digits" =4 ) # set numbering format
+
+##### Data input ######
+ww <- read.csv("Winter Wheat 2016.csv",h=T)
+ww <- na.omit(ww)
+
+##### Change to factor #####
+cols <- c("Alpha","Rep","Cultivar")
+ww[cols] <- lapply(ww[cols], factor)
+
+ww <- data.table(ww)
+
+##### Make column Zone_Loc #####
+ww$Zone_Loc <- factor(paste(ww$Zone, ww$Location, ww$Year,sep = "_"))
+
+trials     <- nlevels(ww$Zone_Loc)
+Envs <- levels(ww$Zone_Loc)
+
+##### Make data list for Stage I #####
+data_list <- matrix(data=list(), nrow=length(Envs), ncol=1, 
+                    dimnames=list(Envs, c("data_Set")))
+
+##### Make a list of Trials #####
+for(i in 1:trials){
+  print(i)
+  b <- levels(ww$Zone_Loc)
+  c <- b[i]
+  Zone_Loc <- as.factor(c)
+  Zone_Loc <- data.table(Zone_Loc)
+  f <- merge(ww,Zone_Loc,by="Zone_Loc")
+  assign(paste0("data_", b[i]), f)
+  data_list[[i, "data_Set" ]] <- f
+  
+  rm(b, c, f, Zone_Loc)
+}
+
+data_list <- data.table(ldply(data_list[, "data_Set"], data.frame, .id="Zone_Loc"))
+
+stgI_list <- matrix(data=list(), nrow=length(Envs), ncol=1, 
+                    dimnames=list(Envs, c("lsmeans")))
+
+asreml.options(maxit=100) # Set asreml iteration
+```
+  
+#### 2. run the first stage analysis
+In the codes below, we can see the mixed models were fited individually by `Envs`. `':='` is a function from `data.table` package. It is used to update subsets of columns ([see here](https://www.rdocumentation.org/packages/data.table/versions/1.13.0/topics/%3A%3D)). Please note that the Smith's weights are computed as $diag(Q^{-1})$ by using `smith.w=diag(solve(blue$vcov))`.   
+
+```{r, eval=FALSE, include=TRUE}
+############################
+##### Stage I LSMEANS #####
+##### per location   #####
+for (i in Envs){
+  
+  Edat <- droplevels(subset(ww, Zone_Loc==i))
+  
+  print(i)
+  
+  mod.1 <- asreml(fixed     = Yield ~ Cultivar,
+                  random      = ~ Rep + Rep:Alpha,
+                  data        = Edat,
+                  predict     = predict.asreml(classify = "Cultivar"))
+  
+  update.asreml(mod.1)
+  print(summary.asreml(mod.1)$varcomp)
+  
+  blue<- predict(mod.1, classify="Cultivar", levels=levels(Edat$Cultivar), vcov=TRUE,aliased = T) # get the lsmeans
+  blue.1 <- data.table(blue$pvals)[, c(1:3)] 
+  names(blue.1) <- c("Cultivar", "Yield_LSM", "se")
+  blue.1[ , ':='(var=se^2, smith.w=diag(solve(blue$vcov)))] # calculate the Smith's weight
+  
+  stgI_list[[i, "lsmeans" ]] <- blue.1 # put all the results of Stage 1 in the list
+  
+  rm(Edat,mod.1, blue, blue.1)
+}
+```
+  
+#### 3. prepare data for the second stage analysis
+```{r, eval=FALSE, include=TRUE}
+#######################################################
+##### Preparing dataset of Stage I for Stage II ######
+
+##### Unlist the results of Stage I and format as data.table #####
+stgII_list <- data.table(ldply(stgI_list[, "lsmeans"], data.frame, .id="Zone_Loc"))
+
+stgII_list$Zone <- factor(str_split_fixed(stgII_list$Zone_Loc, "_", 2)[,1]) # Make Zone column by split the record in Zone_Loc column
+stgII_list$Location <- factor(str_split_fixed(stgII_list$Zone_Loc, "_", 3)[,2])  # Make Location by split the record in Zone_Loc column
+stgII_list$Year <- factor(str_split_fixed(stgII_list$Zone_Loc, "_", 3)[,3]) # Make Year by split the record in Zone_Loc column
+```
+  
+#### 4. run the second stage analysis
+The adjusted means are weighted by `weights = smith.w`. The argument setting `family = asr_gaussian(dispersion=1.0)` is used to constraint variance.  
+  
+[ASReml-R Reference Manual Version 4. page 38](https://asreml.kb.vsni.co.uk/wp-content/uploads/sites/3/2018/02/ASReml-R-Reference-Manual-4.pdf):
+
+> Weighted analyses are achieved by using the weights = wt argument to asreml(), where wt is a variate in the data frame. If these are relative weights (to be scaled by the units variance) then this is all that is required; for example, the number of sampling units (wt=c(3, 1, 3, . . . )). If they are absolute weights, that is, the reciprocal of known variances, the units variance should be constrained to 1.  
+
+```{r, eval=FALSE, include=TRUE}
+############################
+##### Stage II BLUP ######
+##### Zone analysis #####
+mod.2 <- asreml(Yield_LSM  ~ Zone,
+                random    = ~Cultivar + Zone:Location + Zone:Cultivar + Cultivar:Zone:Location,
+                weights   = smith.w,
+                family    = asr_gaussian(dispersion=1.0), # fix residual variance to 1
+                data      = stgII_list,
+                predict   = predict.asreml(classify = "Cultivar:Zone"))
+
+update.asreml(mod.2)
+
+print(summary.asreml(mod.2)$varcomp) # print the variance components
+
+blup.1<- data.table((mod.2$predictions$pvals[1:4])) # set the BLUP results as data.table
+
+blup.1.a <- blup.1[order(Zone,-predicted.value),]  # Sort the results to see the highest yield in each zone
+```
+
+### Example: using `lme4` -> FAILED!
+Since `ASReml-r` is not free, we may be interested in using free R packages to carry out two-stage analysis. I tried to use `lme4` to perform two-stage analysis with Smith's weighting. Unfortunately, I failed when solving the mixed model in the second stage. The R code of testing `lme4` is shown below. Dr. Paul Schmidt is working on this topic (see [MMFAIR project](https://schmidtpaul.github.io/MMFAIR/weighted_two_stage.html#Stage_II)), but, currently, there is no solution for this problem (also probably not possible for other free R package, including `nlme`, `glmmTMB`, and `sommer`). So... We still need to pay if we want to carry out accurate analyses.    
+  
+```{r, eval=FALSE, include=TRUE}
+library(lme4)
+
+# make a new object to save stage I results of lme4
+stgI_list.lme4 <- matrix(data=list(), nrow=length(Envs), ncol=1, 
+                    dimnames=list(Envs, c("lsmeans")))
+
+for (i in Envs){
+  
+  Edat <- droplevels(subset(ww, Zone_Loc==i))
+  
+  print(i)
+  
+  mod.1 <- lmer(formula = Yield ~ 0+ Cultivar+ (1|Rep) + (1|Rep:Alpha),
+                  data        = Edat,
+                  )
+  
+  blue.lme4 <- summary(mod.1)$coef[,1:2] # this will give BLUEs (lsmeans) and standard errors. If using `fixef(mod.1)`, you can get only BLUEs
+  blue.lme4.1 <- data.table(cbind.data.frame(gsub(rownames(blue.lme4), pattern = "Cultivar", replacement = ""),blue.lme4))
+  names(blue.lme4.1) <- c("Cultivar", "Yield_LSM", "se")
+  blue.lme4.1[ , ':='(var=se^2, smith.w=diag(solve(vcov.merMod(mod.1))))] # calculate the Smith's weight
+  
+  stgI_list.lme4[[i, "lsmeans" ]] <- blue.lme4.1 # put all the results of Stage 1 in the list
+  
+  rm(Edat,mod.1, blue.lme4, blue.lme4.1)
+}
+
+
+
+#######################################################
+##### Preparing dataset of Stage I for Stage II ######
+
+##### Unlist the results of Stage I and format as data.table #####
+stgII_list.lme4 <- data.table(ldply(stgI_list.lme4[, "lsmeans"], data.frame, .id="Zone_Loc"))
+
+stgII_list.lme4$Zone <- factor(str_split_fixed(stgII_list.lme4$Zone_Loc, "_", 2)[,1]) # Make Zone column by split the record in Zone_Loc column
+stgII_list.lme4$Location <- factor(str_split_fixed(stgII_list.lme4$Zone_Loc, "_", 3)[,2])  # Make Location by split the record in Zone_Loc column
+stgII_list.lme4$Year <- factor(str_split_fixed(stgII_list.lme4$Zone_Loc, "_", 3)[,3]) # Make Year by split the record in Zone_Loc column
+
+
+############################
+##### Stage II BLUP ######
+##### Zone analysis #####
+mod.2 <- glmer(formula =  Yield_LSM  ~ Zone + (1|Cultivar) + (1|Zone:Location) + (1|Zone:Cultivar) + (1|Cultivar:Zone:Location),
+                weights   = smith.w,
+                family    = gaussian, 
+                data      = stgII_list.lme4
+                ) 
+## Error: number of levels of each grouping factor must be < number of observations
+```
+## Reference
