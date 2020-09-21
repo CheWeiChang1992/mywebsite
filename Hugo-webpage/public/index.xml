@@ -8,35 +8,25 @@
     <language>en-us</language>
     <lastBuildDate>Fri, 18 Sep 2020 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>test hugo</title>
-      <link>/2020/09/18/test-hugo/</link>
-      <pubDate>Fri, 18 Sep 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/2020/09/18/test-hugo/</guid>
-      <description>R Markdown This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
-When you click the Knit button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</description>
-    </item>
-    
-    <item>
-      <title>Two-stage analysis to compute BLUEs and BLUPs</title>
-      <link>/2020/09/18/two-stage-analysis-to-compute-blues-and-blups/</link>
-      <pubDate>Fri, 18 Sep 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/2020/09/18/two-stage-analysis-to-compute-blues-and-blups/</guid>
-      <description>Why we use two-stage analysis? In plant breeding program, candidate genotypes may be tested in multiple environments, e.g. locations and years, to reliably evaluate quantitative traits. Data obtained from multi-environmental trials (MET) is typically analyzed by using mixed models that provide best linear unbiased estimators (BLUEs) and best linear unbiased predictors (BLUPs).
-A standard approach to analyze MET data is by fitting all fixed and random effect with one stage, called single stage analysis.</description>
-    </item>
-    
-    <item>
-      <title>About</title>
+      <title>About Che-Wei Chang</title>
       <link>/about/</link>
-      <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
+      <pubDate>Sun, 20 Sep 2020 00:00:00 +0000</pubDate>
       
       <guid>/about/</guid>
-      <description>Che-Wei Chang I am is currently a PhD student in the Group of Crop Biodiversity and Breeding Informatics (https://evoplant.uni-hohenheim.de/index.html) at the University of Hohenheim, Germany.
+      <description>I am is currently a PhD student in the Group of Crop Biodiversity and Breeding Informatics (https://evoplant.uni-hohenheim.de/index.html) at the University of Hohenheim, Germany.
 My research project focuses on the local adaptation of wild barley and the implementation of genomic prediction in barley breeding.
-This personal web page is used to
+This personal web page is used to record what I learn.
 Education  B.Sc. in Agronomy, National Taiwan University, Taiwan, 2015 M.Sc. in Crop Science, Group of Genetic Breeding, National Taiwan University, Taiwan, 2017  Publication  CW Chang, YH Wang, CW Tung.</description>
+    </item>
+    
+    <item>
+      <title>Two-stage analysis to compute BLUPs</title>
+      <link>/2020/09/18/two-stage-analysis-to-compute-blups/</link>
+      <pubDate>Fri, 18 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/09/18/two-stage-analysis-to-compute-blups/</guid>
+      <description>Why we use two-stage analysis? In plant breeding program, candidate genotypes may be tested in multiple environments, e.g. locations and years, to reliably evaluate quantitative traits. Data obtained from multi-environmental trials (MET) is typically analyzed by using mixed models that provide best linear unbiased estimators (BLUEs) and best linear unbiased predictors (BLUPs).
+A standard approach to analyze MET data is by fitting all fixed and random effect with one stage, called single stage analysis.</description>
     </item>
     
   </channel>

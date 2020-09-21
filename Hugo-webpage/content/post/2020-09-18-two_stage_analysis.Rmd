@@ -1,5 +1,5 @@
 ---
-title: "Two-stage analysis to compute BLUEs and BLUPs"
+title: "Two-stage analysis to compute BLUPs"
 author: "Che-Wei Chang"
 date: "2020-09-18"
 output: html_document
