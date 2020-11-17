@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.75.1" />
+
+
+<title>BLUE or BLUP: Which should be used for GWAS and GS? - A Hugo website</title>
+<meta property="og:title" content="BLUE or BLUP: Which should be used for GWAS and GS? - A Hugo website">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/768px-Uni_Hohenheim-Logo.svg.png"
+         width="100"
+         height="100"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/CheWeiChang1992">GitHub</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">2 min read</span>
+    
+
+    <h1 class="article-title">BLUE or BLUP: Which should be used for GWAS and GS?</h1>
+
+    
+    <span class="article-date">2020-09-22</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>From the breeder's aspect, BLUP (best linear unbiased predictor) is commonly used for selection because it maximizes the probability of correct ranking <span class="citation">(Searle and McCulloch 2001, chap. 9, p.254)</span>.</p>
+<p>On the other hand, using BLUEs (best linear unbiased estimators) of genotypes as response variables for association mapping or genomic prediction has been a conventional approach, but the reason for using BLUEs instead of BLUPs is unclear to me and not explained in the most of papers I found.</p>
+<p>In Prof. Jochen Reif's paper <span class="citation">(He et al. 2016)</span>, the authors' argument is:</p>
+<blockquote>
+<p>... We used BLUEs as response variable for genomic selection and not de-regressed BLUPs as often used in animal breeding (Garrick et al. 2009; Ostersen et al. 2011; Weber et al. 2012). In wheat breeding, the main target of selection is the genotypic but not the breeding value. Therefore, BLUEs seems to be more appropriate as they reflect an estimate of the whole genotypic value and not solely the breeding value. ...</p>
+</blockquote>
+<p>Another answer from the perspective of statistics is that BLUPs will cause shrinkage of genetic effects toward the mean according to the answer of <a href="https://www.researchgate.net/post/Does_any_one_have_an_idea_of_which_one_BLUE_or_BLUP_to_use_for_a_GWAS_analysis_of_a_trait_in_wheat_eg_resistance_to_rust">Prof. Salvador A. Gezan on researchgate</a></p>
+<blockquote>
+<p>... If you use BLUP then you are doing shrinkage of your genetic effects. This will mean that your genetic effects are moved towards the mean according to theri information, yes, they will be your best predictions of those random effects, but they will be adjusted by their sample size and the vairance associated with theri data. This is what a random effects does...</p>
+</blockquote>
+<p><strong>For the reason of why BLUPs shrink toward the mean, <a href="http://nitro.biosci.arizona.edu/workshops/TWIPB2013/Mod3/Mod3-5.pdf">Prof. Bruce Walsh gave the mathematical proof in his lecture note (see page 23 of the note)</a>.</strong> The degree of shrinkage is equal to heritability (<span class="math inline">\(BLUP = h^2(y-\mu)\)</span> ). As shown in the formula, BLUPs shrink toward 0 since the random effect is assumed following <span class="math inline">\(N(0, \sigma^2)\)</span>.</p>
+<div id="conclusion" class="section level3">
+<h3>Conclusion</h3>
+<p>BLUEs should be used for association mapping and genomic prediction due to the shrinkage of BLUPs may eliminate genetic effects.</p>
+</div>
+<div id="reference" class="section level2 unnumbered">
+<h2>Reference</h2>
+<div id="refs" class="references">
+<div id="ref-he2016genomic">
+<p>He, Sang, Albert Wilhelm Schulthess, Vilson Mirdita, Yusheng Zhao, Viktor Korzun, Reiner Bothe, Erhard Ebmeyer, Jochen C Reif, and Yong Jiang. 2016. “Genomic Selection in a Commercial Winter Wheat Population.” <em>Theoretical and Applied Genetics</em> 129 (3). Springer: 641–51.</p>
+</div>
+<div id="ref-searle2001generalized">
+<p>Searle, Shayle Robert, and Charles E McCulloch. 2001. <em>Generalized, Linear and Mixed Models</em>. Wiley.</p>
+</div>
+</div>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

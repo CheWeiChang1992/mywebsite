@@ -173,8 +173,8 @@ blup.1<- data.table((mod.2$predictions$pvals[1:4])) # set the BLUP results as da
 blup.1.a <- blup.1[order(Zone,-predicted.value),]  # Sort the results to see the highest yield in each zone
 ```
 
-### Example: using `lme4` -> FAILED!
-Since `ASReml-r` is not free, we may be interested in using free R packages to carry out two-stage analysis. I tried to use `lme4` to perform two-stage analysis with Smith's weighting. Unfortunately, I failed when solving the mixed model in the second stage. The R code of testing `lme4` is shown below. Dr. Paul Schmidt is working on this topic (see [MMFAIR project](https://schmidtpaul.github.io/MMFAIR/weighted_two_stage.html#Stage_II)), but, currently, there is no solution for this problem (also probably not possible for other free R package, including `nlme`, `glmmTMB`, and `sommer`). So... We still need to pay if we want to carry out accurate analyses.    
+### Example: using `lme4`
+Since `ASReml-r` is not free, we may be interested in using free R packages to carry out two-stage analysis. I tried to use `lme4` to perform two-stage analysis with Smith's weighting. Unfortunately, I failed when solving the mixed model in the second stage. The R code of testing `lme4` is shown below. Dr. Paul Schmidt is working on this topic (see [MMFAIR project](https://schmidtpaul.github.io/MMFAIR/weighted_two_stage.html#Stage_II)), but, currently, there is no solution for this problem (also probably not possible for other free R package, including `nlme`, `glmmTMB`, and `sommer`). So... We may still need to pay if we want to carry out accurate analyses?    
   
 ```{r, eval=FALSE, include=TRUE}
 library(lme4)
@@ -226,4 +226,40 @@ mod.2 <- glmer(formula =  Yield_LSM  ~ Zone + (1|Cultivar) + (1|Zone:Location) +
                 ) 
 ## Error: number of levels of each grouping factor must be < number of observations
 ```
+  
+To solve the error, I used the method suggested in a [StackOverflow post](https://stackoverflow.com/questions/19713228/lmer-error-grouping-factor-must-be-number-of-observations). Basically, I used `lmerControl` to skip some checking processes and force `lme4` to solve the mixed model. The result is close but different from the BLUPs estimated by `ASReml-r` ($r = 0.9821$).  
+```{r ,eval=FALSE, include=TRUE}
+############################
+##### Stage II BLUP ######
+##### Zone analysis #####
+mod.2 <- lmer(formula =  Yield_LSM  ~ 0+Zone + (1|Cultivar) + (1|Zone:Location) + (1|Zone:Cultivar) + (1|Cultivar:Zone:Location),
+                weights   = smith.w,
+                
+                data      = stgII_list.lme4,
+                control=lmerControl(check.nobs.vs.nlev = "ignore",
+                                   check.nobs.vs.rankZ = "ignore",
+                                   check.nobs.vs.nRE="ignore")
+                )
+
+
+blup.lme4 <- data.frame(matrix(NA, ncol = 3, nrow = 3*nrow(ranef(mod.2)$Cultivar))) # save output in a format as the result of ASReml-r
+colnames(blup.lme4) <- c("Cultivar", "Zone", "BLUP")
+blup.lme4$Zone <- gsub(names(fixef(mod.2)), pattern = "Zone", replacement = "")
+blup.lme4$Cultivar <- rep(rownames(ranef(mod.2)$Cultivar), each = 3)
+
+nCultivar <- nrow(ranef(mod.2)$Cultivar)
+for(i in 1:nCultivar){
+  blup.lme4[(1+(i-1)*3):(3+(i-1)*3),3] <- ranef(mod.2)$Cultivar[i,1] + fixef(mod.2)
+}
+
+
+cor(blup.lme4$BLUP, blup.1[,3])
+## correlation 0.9821
+plot(blup.lme4$BLUP, c(as.matrix(blup.1[,3])), xlab = "lme4 BLUP", ylab = "ASReml-r BLUP")
+text(x = 800, y = 900, "cor = 0.9821")
+```
+![](/img/lme4_vs_asreml_blup.png){width=50%}
+
+
+
 ## Reference

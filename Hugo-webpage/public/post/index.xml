@@ -6,7 +6,26 @@
     <description>Recent content in Posts on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 18 Sep 2020 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 17 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Causal structure inference: IC algorithm and SEM model</title>
+      <link>/2020/11/17/causal-structure-inference-ic-algorithm-and-sem-model/</link>
+      <pubDate>Tue, 17 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/11/17/causal-structure-inference-ic-algorithm-and-sem-model/</guid>
+      <description> Why we study causal structure of traits?  Reference  </description>
+    </item>
+    
+    <item>
+      <title>BLUE or BLUP: Which should be used for GWAS and GS?</title>
+      <link>/2020/09/22/blue-or-blup-which-should-be-used-for-gwas-and-gs/</link>
+      <pubDate>Tue, 22 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/09/22/blue-or-blup-which-should-be-used-for-gwas-and-gs/</guid>
+      <description>From the breeder&#39;s aspect, BLUP (best linear unbiased predictor) is commonly used for selection because it maximizes the probability of correct ranking (Searle and McCulloch 2001, chap. 9, p.254).
+On the other hand, using BLUEs (best linear unbiased estimators) of genotypes as response variables for association mapping or genomic prediction has been a conventional approach, but the reason for using BLUEs instead of BLUPs is unclear to me and not explained in the most of papers I found.</description>
+    </item>
+    
     <item>
       <title>Two-stage analysis to compute BLUPs</title>
       <link>/2020/09/18/two-stage-analysis-to-compute-blups/</link>

@@ -60,7 +60,7 @@
 
   <article class="article">
     
-    <span class="article-duration">8 min read</span>
+    <span class="article-duration">9 min read</span>
     
 
     <h1 class="article-title">Two-stage analysis to compute BLUPs</h1>
@@ -227,9 +227,9 @@ blup.1&lt;- data.table((mod.2$predictions$pvals[1:4])) # set the BLUP results as
 blup.1.a &lt;- blup.1[order(Zone,-predicted.value),]  # Sort the results to see the highest yield in each zone</code></pre>
 </div>
 </div>
-<div id="example-using-lme4---failed" class="section level3">
-<h3>Example: using <code>lme4</code> -&gt; FAILED!</h3>
-<p>Since <code>ASReml-r</code> is not free, we may be interested in using free R packages to carry out two-stage analysis. I tried to use <code>lme4</code> to perform two-stage analysis with Smith's weighting. Unfortunately, I failed when solving the mixed model in the second stage. The R code of testing <code>lme4</code> is shown below. Dr. Paul Schmidt is working on this topic (see <a href="https://schmidtpaul.github.io/MMFAIR/weighted_two_stage.html#Stage_II">MMFAIR project</a>), but, currently, there is no solution for this problem (also probably not possible for other free R package, including <code>nlme</code>, <code>glmmTMB</code>, and <code>sommer</code>). So... We still need to pay if we want to carry out accurate analyses.</p>
+<div id="example-using-lme4" class="section level3">
+<h3>Example: using <code>lme4</code></h3>
+<p>Since <code>ASReml-r</code> is not free, we may be interested in using free R packages to carry out two-stage analysis. I tried to use <code>lme4</code> to perform two-stage analysis with Smith's weighting. Unfortunately, I failed when solving the mixed model in the second stage. The R code of testing <code>lme4</code> is shown below. Dr. Paul Schmidt is working on this topic (see <a href="https://schmidtpaul.github.io/MMFAIR/weighted_two_stage.html#Stage_II">MMFAIR project</a>), but, currently, there is no solution for this problem (also probably not possible for other free R package, including <code>nlme</code>, <code>glmmTMB</code>, and <code>sommer</code>). So... We may still need to pay if we want to carry out accurate analyses?</p>
 <pre class="r"><code>library(lme4)
 
 # make a new object to save stage I results of lme4
@@ -278,6 +278,39 @@ mod.2 &lt;- glmer(formula =  Yield_LSM  ~ Zone + (1|Cultivar) + (1|Zone:Location
                 data      = stgII_list.lme4
                 ) 
 ## Error: number of levels of each grouping factor must be &lt; number of observations</code></pre>
+<p>To solve the error, I used the method suggested in a <a href="https://stackoverflow.com/questions/19713228/lmer-error-grouping-factor-must-be-number-of-observations">StackOverflow post</a>. Basically, I used <code>lmerControl</code> to skip some checking processes and force <code>lme4</code> to solve the mixed model. The result is close but different from the BLUPs estimated by <code>ASReml-r</code> (<span class="math inline">\(r = 0.9821\)</span>).</p>
+<pre class="r"><code>############################
+##### Stage II BLUP ######
+##### Zone analysis #####
+mod.2 &lt;- lmer(formula =  Yield_LSM  ~ 0+Zone + (1|Cultivar) + (1|Zone:Location) + (1|Zone:Cultivar) + (1|Cultivar:Zone:Location),
+                weights   = smith.w,
+                
+                data      = stgII_list.lme4,
+                control=lmerControl(check.nobs.vs.nlev = &quot;ignore&quot;,
+                                   check.nobs.vs.rankZ = &quot;ignore&quot;,
+                                   check.nobs.vs.nRE=&quot;ignore&quot;)
+                )
+
+
+blup.lme4 &lt;- data.frame(matrix(NA, ncol = 3, nrow = 3*nrow(ranef(mod.2)$Cultivar))) # save output in a format as the result of ASReml-r
+colnames(blup.lme4) &lt;- c(&quot;Cultivar&quot;, &quot;Zone&quot;, &quot;BLUP&quot;)
+blup.lme4$Zone &lt;- gsub(names(fixef(mod.2)), pattern = &quot;Zone&quot;, replacement = &quot;&quot;)
+blup.lme4$Cultivar &lt;- rep(rownames(ranef(mod.2)$Cultivar), each = 3)
+
+nCultivar &lt;- nrow(ranef(mod.2)$Cultivar)
+for(i in 1:nCultivar){
+  blup.lme4[(1+(i-1)*3):(3+(i-1)*3),3] &lt;- ranef(mod.2)$Cultivar[i,1] + fixef(mod.2)
+}
+
+
+cor(blup.lme4$BLUP, blup.1[,3])
+## correlation 0.9821
+plot(blup.lme4$BLUP, c(as.matrix(blup.1[,3])), xlab = &quot;lme4 BLUP&quot;, ylab = &quot;ASReml-r BLUP&quot;)
+text(x = 800, y = 900, &quot;cor = 0.9821&quot;)</code></pre>
+<div class="figure">
+<img src="/img/lme4_vs_asreml_blup.png" style="width:50.0%" />
+
+</div>
 </div>
 </div>
 <div id="reference" class="section level2 unnumbered">

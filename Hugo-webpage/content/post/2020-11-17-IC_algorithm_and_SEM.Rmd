@@ -1,0 +1,11 @@
+---
+title: "Causal structure inference: IC algorithm and SEM model"
+author: "Che-Wei Chang"
+date: "2020-11-17"
+output: html_document
+bibliography: bib/ref.bib
+---
+## Why we study causal structure of traits?
+
+
+## Reference

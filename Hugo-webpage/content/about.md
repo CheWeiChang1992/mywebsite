@@ -4,10 +4,10 @@ title: About Che-Wei Chang
 ---
 
 
-I am is currently a PhD student in the Group of Crop Biodiversity and Breeding Informatics  (https://evoplant.uni-hohenheim.de/index.html) at the University of Hohenheim, Germany.  
-My research project focuses on the local adaptation of wild barley and the implementation of genomic prediction in barley breeding.  
+I am currently a PhD student in the Group of Crop Biodiversity and Breeding Informatics  (https://evoplant.uni-hohenheim.de/index.html) at the University of Hohenheim, Germany.  
+My research topics focus on the local adaptation of wild barley and the implementation of genomic prediction in barley breeding.  
   
-This personal web page is used to record what I learn.     
+This personal web page is used to record what I learn from my study.     
 
 ## Education
 - B.Sc. in Agronomy, National Taiwan University, Taiwan, 2015   
