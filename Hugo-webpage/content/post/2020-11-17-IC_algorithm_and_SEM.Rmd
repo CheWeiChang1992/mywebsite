@@ -1,11 +1,18 @@
 ---
-title: "Causal structure inference: IC algorithm and SEM model"
+title: "Causal structure inference: IC algorithm and SEM"
 author: "Che-Wei Chang"
 date: "2020-11-17"
 output: html_document
 bibliography: bib/ref.bib
 ---
 ## Why we study causal structure of traits?
+In a biological system, one trait may contribute to another and result in a complex pathway network. If causal relationships exist, we can expect that unselected traits will change when we select specific traits. We can use this feature to indirectly improve a target trait when it is difficult or expensive to measure. Also, this feature may cause an undesirable change in traits that we want to maintain. Therefore, understanding causal structures can be helpful for us to define our breeding strategies.  
+
+
+## Inductive causation (IC) algorithm
+
+
+## Structural equation models (SEM)
 
 
 ## Reference
