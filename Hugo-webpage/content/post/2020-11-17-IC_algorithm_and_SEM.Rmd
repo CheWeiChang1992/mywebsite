@@ -8,11 +8,22 @@ bibliography: bib/ref.bib
 ## Why we study causal structure of traits?
 In a biological system, one trait may contribute to another and result in a complex pathway network. If causal relationships exist, we can expect that unselected traits will change when we select specific traits. We can use this feature to indirectly improve a target trait when it is difficult or expensive to measure. Also, this feature may cause an undesirable change in traits that we want to maintain. Therefore, understanding causal structures can be helpful for us to define our breeding strategies.  
 
-
 ## Inductive causation (IC) algorithm
+Before introducing structural equation models [SEM; @Wright1921CorrelationAndCausation; @haavelmo1943statistical], which can infer causal coefficients, we first look at the inductive causation (IC) algorithm.  
+  
+Conventionally, the inference of causal coefficients requires prior knowledge of phenotypes under studying. However, if causal relationships are unclear, it is not possible to perform inference. Additionaly, our inference can be limited to the known causal relationship and ignore other possibilities even if we have prior knowledge.   
+  
+To solve the mentioned problem, @valente2010searching implemented the IC algorithm [@verma1990equivalence; @pearl2000models] as a data-driven approach to indentify causal relationships.
+The IC algorithm assumes that no hidden variables affect more than one of the variable, which are included in the searching process, that is, **causal sufficiency assumption**.
 
 
 ## Structural equation models (SEM)
+
+
+
+
+
+
 
 
 ## Reference
