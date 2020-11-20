@@ -13,8 +13,48 @@ Before introducing structural equation models [SEM; @Wright1921CorrelationAndCau
   
 Conventionally, the inference of causal coefficients requires prior knowledge of phenotypes under studying. However, if causal relationships are unclear, it is not possible to perform inference. Additionaly, our inference can be limited to the known causal relationship and ignore other possibilities even if we have prior knowledge.   
   
-To solve the mentioned problem, @valente2010searching implemented the IC algorithm [@verma1990equivalence; @pearl2000models] as a data-driven approach to indentify causal relationships.
-The IC algorithm assumes that no hidden variables affect more than one of the variable, which are included in the searching process, that is, **causal sufficiency assumption**.
+To solve the mentioned problem, @valente2010searching implemented the IC algorithm [@verma1990equivalence; @pearl2000models] as a data-driven approach to indentify causal relationships. In this way, we can investigate the causal structure even if we have zero or limited prior knowledge!  
+
+### (1) Assumption of IC algorithm
+The IC algorithm assumes that no hidden variables affect more than one of the variable, which are included in the searching process, that is, **causal sufficiency assumption**. We will have a misleading result if our data violates this assumption.   
+  
+For instance, **if there are observed variables `a` and `b` sharing a common causeal variable `c`, but `c` is unavailable in our data, this will result in a misleading edge between `a` and `b` in the oriented graph because the IC algorithm cannot identify the correct causal structure (correlation attributes to a common hidden cause) by conditioning the correlation of `a` and `b` on `c`**.  
+
+
+### (2) confounding effect of genetic relationship
+As genetic effects also contribute to traits, @valente2010searching considered random genetic effects in a multiple-trait model to exclude the genetic effects on causal relationships before performing the IC algorithm.  
+  
+A mixed model of traits can be simply written as:  
+  
+$Y = X\beta + Zu + e$   
+  
+where $Y$ is a multi-trait matrix; $u$ and $e$ represent random genetic effects and residuals (phenotypic effects are included in residuals) respectively with a joint distribution:     
+  
+$\begin{bmatrix} u \\ e \end{bmatrix} \sim \begin{bmatrix}G & 0\\ 0 & R\end{bmatrix}$
+   
+
+Thus,  
+$Var(Y) = G + R$  
+
+By conditioning on genetic effects, we can have:  
+$Var(Y|u) = R$  
+
+@valente2010searching used a Bayesian method to infer the posterior distribution of $R$ and used that posterior distribution as the input of the IC algorithm.  
+
+### (3) How does IC algorithm work?
+The IC algorithm is aiming to generate an oriented network graph that connects traits by directed edges. Its procedure can roughly divided into three steps.  
+
+#### Step 1: identify adjacent variables in an undirected graph
+Let's assume we have three traits, $T = \{t1, t2, t3\}$, and their true relationship is $t1\gets t2\to t3$. Thus, we should find three traits correlate with each other (correlation coeffeicient $\rho_{t1,t2} \ne 0; \rho_{t1,t3}\ne 0; \rho_{t2,t3}\ne 0$) but, theoretically, the partial correlation $\rho_{t1,t3|t2} = 0$ while $\rho_{t1,t2|t3}\ne0$ and $\rho_{t2,t3|t1}\ne0$.  
+  
+With this feature, we can infer an undirected graph that $t1$ and $t3$ are not neighbor ($t1-t2-t3$).  
+
+In a real analysis, we will have more complex structure, but the general idea is the same. If we can find two variables, $a$ and $b$, have non-zero partial correlation when conditioning on any remaining variables ($\rho_{a,b|S_{ab}}\ne 0$ where $S_{ab}\notin \{a,b\}$), then we can declare the variable $a$ and $b$ are adjacent in a network graph because no observed variable can block the correlation of $a$ and $b$.  
+
+#### Step 2: orient undirected edges
+In the example we discussed here, it is easy to conclude a causal structure $t1\gets t2\to t3$ as conditioning on $t2$ can block the correlation of $t1$ and $t3$ resulting $\rho_{t1,t3|t2}=0$.  
+In practical case, we would search for any variable can block nonadjacent variable $a$ and $b$. If any variable $S_{ab}$ can result in $\rho_{a,b|S_{ab}}= 0$, we can infer $a \gets S_{ab} \to b$. Otherwise, we will deduce $a \to S_{ab} \gets b$.  
+  
 
 
 ## Structural equation models (SEM)

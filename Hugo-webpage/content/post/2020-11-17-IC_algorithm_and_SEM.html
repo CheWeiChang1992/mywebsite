@@ -193,7 +193,40 @@ summary {
 <h2>Inductive causation (IC) algorithm</h2>
 <p>Before introducing structural equation models <span class="citation">(SEM; Wright 1921; Haavelmo 1943)</span>, which can infer causal coefficients, we first look at the inductive causation (IC) algorithm.</p>
 <p>Conventionally, the inference of causal coefficients requires prior knowledge of phenotypes under studying. However, if causal relationships are unclear, it is not possible to perform inference. Additionaly, our inference can be limited to the known causal relationship and ignore other possibilities even if we have prior knowledge.</p>
-<p>To solve the mentioned problem, <span class="citation">Valente et al. (2010)</span> implemented the IC algorithm <span class="citation">(Verma and Pearl 1990; Pearl and others 2000)</span> as a data-driven approach to indentify causal relationships. The IC algorithm assumes that no hidden variables affect more than one of the variable, which are included in the searching process, that is, <strong>causal sufficiency assumption</strong>.</p>
+<p>To solve the mentioned problem, <span class="citation">Valente et al. (2010)</span> implemented the IC algorithm <span class="citation">(Verma and Pearl 1990; Pearl and others 2000)</span> as a data-driven approach to indentify causal relationships. In this way, we can investigate the causal structure even if we have zero or limited prior knowledge!</p>
+<div id="assumption-of-ic-algorithm" class="section level3">
+<h3>(1) Assumption of IC algorithm</h3>
+<p>The IC algorithm assumes that no hidden variables affect more than one of the variable, which are included in the searching process, that is, <strong>causal sufficiency assumption</strong>. We will have a misleading result if our data violates this assumption.</p>
+<p>For instance, <strong>if there are observed variables <code>a</code> and <code>b</code> sharing a common causeal variable <code>c</code>, but <code>c</code> is unavailable in our data, this will result in a misleading edge between <code>a</code> and <code>b</code> in the oriented graph because the IC algorithm cannot identify the correct causal structure (correlation attributes to a common hidden cause) by conditioning the correlation of <code>a</code> and <code>b</code> on <code>c</code></strong>.</p>
+</div>
+<div id="confounding-effect-of-genetic-relationship" class="section level3">
+<h3>(2) confounding effect of genetic relationship</h3>
+<p>As genetic effects also contribute to traits, <span class="citation">Valente et al. (2010)</span> considered random genetic effects in a multiple-trait model to exclude the genetic effects on causal relationships before performing the IC algorithm.</p>
+<p>A mixed model of traits can be simply written as:</p>
+<p><span class="math inline">\(Y = X\beta + Zu + e\)</span></p>
+<p>where <span class="math inline">\(Y\)</span> is a multi-trait matrix; <span class="math inline">\(u\)</span> and <span class="math inline">\(e\)</span> represent random genetic effects and residuals (phenotypic effects are included in residuals) respectively with a joint distribution:</p>
+<p><span class="math inline">\(\begin{bmatrix} u \\ e \end{bmatrix} \sim \begin{bmatrix}G &amp; 0\\ 0 &amp; R\end{bmatrix}\)</span></p>
+<p>Thus,<br />
+<span class="math inline">\(Var(Y) = G + R\)</span></p>
+<p>By conditioning on genetic effects, we can have:<br />
+<span class="math inline">\(Var(Y|u) = R\)</span></p>
+<p><span class="citation">Valente et al. (2010)</span> used a Bayesian method to infer the posterior distribution of <span class="math inline">\(R\)</span> and used that posterior distribution as the input of the IC algorithm.</p>
+</div>
+<div id="how-does-ic-algorithm-work" class="section level3">
+<h3>(3) How does IC algorithm work?</h3>
+<p>The IC algorithm is aiming to generate an oriented network graph that connects traits by directed edges. Its procedure can roughly divided into three steps.</p>
+<div id="step-1-identify-adjacent-variables-in-an-undirected-graph" class="section level4">
+<h4>Step 1: identify adjacent variables in an undirected graph</h4>
+<p>Let's assume we have three traits, <span class="math inline">\(T = \{t1, t2, t3\}\)</span>, and their true relationship is <span class="math inline">\(t1\gets t2\to t3\)</span>. Thus, we should find three traits correlate with each other (correlation coeffeicient <span class="math inline">\(\rho_{t1,t2} \ne 0; \rho_{t1,t3}\ne 0; \rho_{t2,t3}\ne 0\)</span>) but, theoretically, the partial correlation <span class="math inline">\(\rho_{t1,t3|t2} = 0\)</span> while <span class="math inline">\(\rho_{t1,t2|t3}\ne0\)</span> and <span class="math inline">\(\rho_{t2,t3|t1}\ne0\)</span>.</p>
+<p>With this feature, we can infer an undirected graph that <span class="math inline">\(t1\)</span> and <span class="math inline">\(t3\)</span> are not neighbor (<span class="math inline">\(t1-t2-t3\)</span>).</p>
+<p>In a real analysis, we will have more complex structure, but the general idea is the same. If we can find two variables, <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>, have non-zero partial correlation when conditioning on any remaining variables (<span class="math inline">\(\rho_{a,b|S_{ab}}\ne 0\)</span> where <span class="math inline">\(S_{ab}\notin \{a,b\}\)</span>), then we can declare the variable <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> are adjacent in a network graph because no observed variable can block the correlation of <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>.</p>
+</div>
+<div id="step-2-orient-undirected-edges" class="section level4">
+<h4>Step 2: orient undirected edges</h4>
+<p>In the example we discussed here, it is easy to conclude a causal structure <span class="math inline">\(t1\gets t2\to t3\)</span> as conditioning on <span class="math inline">\(t2\)</span> can block the correlation of <span class="math inline">\(t1\)</span> and <span class="math inline">\(t3\)</span> resulting <span class="math inline">\(\rho_{t1,t3|t2}=0\)</span>.<br />
+In practical case, we would search for any variable can block nonadjacent variable <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>. If any variable <span class="math inline">\(S_{ab}\)</span> can result in <span class="math inline">\(\rho_{a,b|S_{ab}}= 0\)</span>, we can infer <span class="math inline">\(a \gets S_{ab} \to b\)</span>. Otherwise, we will deduce <span class="math inline">\(a \to S_{ab} \gets b\)</span>.</p>
+</div>
+</div>
 </div>
 <div id="structural-equation-models-sem" class="section level2">
 <h2>Structural equation models (SEM)</h2>
