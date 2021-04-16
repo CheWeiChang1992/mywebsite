@@ -1,7 +1,7 @@
 ---
 title: "Two-stage analysis to compute BLUPs"
 author: "Che-Wei Chang"
-date: "2020-09-18"
+date: "2020-12-07"
 output: html_document
 bibliography: bib/ref.bib
 ---
@@ -10,7 +10,7 @@ bibliography: bib/ref.bib
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Why we use two-stage analysis?
+## Why do we use two-stage analysis?
 In plant breeding program, candidate genotypes may be tested in multiple environments, e.g. locations and years, to reliably evaluate quantitative traits. Data obtained from multi-environmental trials (MET) is typically analyzed by using mixed models that provide best linear unbiased estimators (BLUEs) and best linear unbiased predictors (BLUPs).  
   
 A standard approach to analyze MET data is by fitting all fixed and random effect with one stage, called single stage analysis. However, single-stage analysis is computationally inefficient, which requires considerable computational time and memory when the number of genotypes and environments is huge [@mohring2009comparison; @piepho2012stage]. This disadvantage of single-stage analysis is especially problematic if users need to perform cross-validation [@piepho2012stage].  
@@ -33,7 +33,7 @@ And two models can be combined as $y_j=X_{1(j)}X_{2(j)}\beta_b+X_{1(j)}Z_{2(j)}u
 We should note that in the first stage, effects of genotypes are recommended being fitted as fixed effect to avoid double shrinkage [@smith2001; @piepho2012stage].  
 
 ## Weighting in the second stage
-A main problem with two-stage analysis is **the heterogeneity of error variance between trials (variance-covariance structure of adjusted means)**. @smith2001 proposed a weighting scheme (Smith's weighting) to account for the heterogeneity by using $\Pi=diag(\pi_{ij})$ where $\pi_{ij}=\tilde{\sigma}^2\tilde{\sigma}_{jii}^{-1}$; $\tilde{\sigma}_{jii}$ is the diagnal element of $\tilde{\Sigma}_j$; $i$ represents i-th genotype and $j$ represents j-th trial [see the section 3.4 in @smith2001 for details].  
+A main problem with two-stage analysis is **the heterogeneity of error variance between trials (variance-covariance structure of adjusted means)**. @smith2001 proposed a weighting scheme (Smith's weighting) to account for the heterogeneity of error variance, resulting from unbalanced data, by using $\Pi=diag(\pi_{ij})$ where $\pi_{ij}=r_{ij}\tilde{\sigma}^2/\tilde{\sigma_j}^2=\tilde{\sigma}^2\tilde{\sigma}_{jii}^{-1}$; $\tilde{\sigma}_{jii}$ is the diagnal element of $\tilde{\Sigma}_j$; $r_{ij}$ is the number of non-missing plot; $i$ represents i-th genotype and $j$ represents j-th trial [see the section 3.4 in @smith2001 for details].  
   
 @mohring2009comparison further proposed several weighting methods and compared them by using single-stage analysis as benchmark. @mohring2009comparison suggested that the weighting methods are superior than unweighted method, but the performance of weighting methods depends on datasets [@mohring2009comparison]. However, @mohring2009comparison also concluded that the difference between weighting methods is small, so weighting methods can be chosen according to computational convenience.  
   

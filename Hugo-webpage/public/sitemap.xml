@@ -4,17 +4,27 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2020-11-17T00:00:00+00:00</lastmod>
+    <lastmod>2020-12-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/2020/11/17/causal-structure-inference-ic-algorithm-and-sem-model/</loc>
-    <lastmod>2020-11-17T00:00:00+00:00</lastmod>
+    <loc>/2020/12/18/controlling-spatial-heterogeneity-in-mixed-models/</loc>
+    <lastmod>2020-12-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/post/</loc>
-    <lastmod>2020-11-17T00:00:00+00:00</lastmod>
+    <lastmod>2020-12-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2020/12/07/causal-structure-inference-ic-algorithm-and-sem/</loc>
+    <lastmod>2020-12-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2020/12/07/two-stage-analysis-to-compute-blups/</loc>
+    <lastmod>2020-12-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -25,11 +35,6 @@
   <url>
     <loc>/about/</loc>
     <lastmod>2020-09-20T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/2020/09/18/two-stage-analysis-to-compute-blups/</loc>
-    <lastmod>2020-09-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>

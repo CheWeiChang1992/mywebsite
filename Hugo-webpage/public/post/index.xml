@@ -6,14 +6,35 @@
     <description>Recent content in Posts on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 17 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 18 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Causal structure inference: IC algorithm and SEM model</title>
-      <link>/2020/11/17/causal-structure-inference-ic-algorithm-and-sem-model/</link>
-      <pubDate>Tue, 17 Nov 2020 00:00:00 +0000</pubDate>
+      <title>Controlling spatial heterogeneity in mixed models</title>
+      <link>/2020/12/18/controlling-spatial-heterogeneity-in-mixed-models/</link>
+      <pubDate>Fri, 18 Dec 2020 00:00:00 +0000</pubDate>
       
-      <guid>/2020/11/17/causal-structure-inference-ic-algorithm-and-sem-model/</guid>
-      <description> Why we study causal structure of traits?  Reference  </description>
+      <guid>/2020/12/18/controlling-spatial-heterogeneity-in-mixed-models/</guid>
+      <description> What is spatial heterogeneity? In field trials, adjacent plots could be influenced by
+For a quick comparison of lme4 and &#39;nlme&#39;, lme4 is currently fastest but nlme is more flexible, allowing users to specify the covariance structure of residuals (For details, please see GLMM FAQ, written by one of the author of lme4).
+ Compare the results of the AR1 model calculated by sommer, nlme and asreml  Reference  </description>
+    </item>
+    
+    <item>
+      <title>Causal structure inference: IC algorithm and SEM</title>
+      <link>/2020/12/07/causal-structure-inference-ic-algorithm-and-sem/</link>
+      <pubDate>Mon, 07 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/12/07/causal-structure-inference-ic-algorithm-and-sem/</guid>
+      <description>Why we study causal structure of traits? In a biological system, one trait may contribute to another and result in a complex pathway network. If causal relationships exist, we can expect that unselected traits will change when we select specific traits. We can use this feature to indirectly improve a target trait that is difficult or expensive to measure or has low heritability. Also, this feature may cause an undesirable change in traits that we want to maintain.</description>
+    </item>
+    
+    <item>
+      <title>Two-stage analysis to compute BLUPs</title>
+      <link>/2020/12/07/two-stage-analysis-to-compute-blups/</link>
+      <pubDate>Mon, 07 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/12/07/two-stage-analysis-to-compute-blups/</guid>
+      <description>Why do we use two-stage analysis? In plant breeding program, candidate genotypes may be tested in multiple environments, e.g. locations and years, to reliably evaluate quantitative traits. Data obtained from multi-environmental trials (MET) is typically analyzed by using mixed models that provide best linear unbiased estimators (BLUEs) and best linear unbiased predictors (BLUPs).
+A standard approach to analyze MET data is by fitting all fixed and random effect with one stage, called single stage analysis.</description>
     </item>
     
     <item>
@@ -24,16 +45,6 @@
       <guid>/2020/09/22/blue-or-blup-which-should-be-used-for-gwas-and-gs/</guid>
       <description>From the breeder&#39;s aspect, BLUP (best linear unbiased predictor) is commonly used for selection because it maximizes the probability of correct ranking (Searle and McCulloch 2001, chap. 9, p.254).
 On the other hand, using BLUEs (best linear unbiased estimators) of genotypes as response variables for association mapping or genomic prediction has been a conventional approach, but the reason for using BLUEs instead of BLUPs is unclear to me and not explained in the most of papers I found.</description>
-    </item>
-    
-    <item>
-      <title>Two-stage analysis to compute BLUPs</title>
-      <link>/2020/09/18/two-stage-analysis-to-compute-blups/</link>
-      <pubDate>Fri, 18 Sep 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/2020/09/18/two-stage-analysis-to-compute-blups/</guid>
-      <description>Why we use two-stage analysis? In plant breeding program, candidate genotypes may be tested in multiple environments, e.g. locations and years, to reliably evaluate quantitative traits. Data obtained from multi-environmental trials (MET) is typically analyzed by using mixed models that provide best linear unbiased estimators (BLUEs) and best linear unbiased predictors (BLUPs).
-A standard approach to analyze MET data is by fitting all fixed and random effect with one stage, called single stage analysis.</description>
     </item>
     
   </channel>

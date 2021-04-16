@@ -1,0 +1,70 @@
+---
+title: "Controlling spatial heterogeneity in mixed models"
+author: "Che-Wei Chang"
+date: "2020-12-18"
+bibliography: bib/ref.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## What is spatial heterogeneity?
+In field trials, adjacent plots could be correlated due to some factors with spatial pattern, such as micro-climate or the movement of machines in fields. Therefore, it would be reasonible to consider the effect of spatial correlation when fitting a mixed model.
+
+## First-order autoregression model (AR1) and nugget effects
+Conventionally, first order autoregressive (AR1) models are used to capture spatial effects (AR1 can also be used to analyze time-series data). In a two-dimensional AR1xAR1 model, the variance of residuals is modeled as: 
+
+$\sigma_e^2 \Sigma_{col}(\rho_{col}) \otimes \Sigma_{row}(\rho_{row})$ where $\Sigma= \begin{bmatrix}1 & &  & & \\\rho & 1 &  & & \\ \rho^2 & \rho & 1 & & \\ \vdots & \vdots & \vdots & \ddots&  \\ \rho_{r-1} & \rho_{r-2} & \rho_{r-3} & \dots &1 \end{bmatrix}$
+
+The residual structure can be one direction in columns or rows by replacing $\Sigma_{row}$ or $\Sigma_{col}$ with $I_n$ respectively.  
+
+Another conventional spatial model is AR1xAR1 with nugget effects. In this model, a term of random effect with $\sigma_{un}^2 I_n$ would be fitted in a mixed model with AR1xAR1 residual structure $\sigma_e^2 \Sigma_{col}(\rho_{col}) \otimes \Sigma_{row}(\rho_{row})$. Thus, the variance of response variable would be $var(y)=\sigma_{un}^2 I_n + \sigma_e^2 \Sigma_{col}(\rho_{col}) \otimes \Sigma_{row}(\rho_{row})$, where $\sigma_{un}^2 I_n$ is so-called **measurement error variance or nugget variance**. 
+
+Here, we give some examples of AR1 spatial models by using `Asreml-r`
+
+```{r, eval=F, include=T}
+
+library(asreml)
+mydat = read.csv(./barley_field_trial.csv)
+
+fm <- list(
+  # unstructured residual structure
+  model1 = asreml(Y ~ Genotype, random = ~Block, residual = ~idv(units), data = mydat)
+  # correlation in column
+  model2 = asreml(Y ~ Genotype, random = ~Block, residual = ~idv(Row):ar1(Column), data = mydat)
+  # correlation in row
+  model3 = asreml(Y ~ Genotype, random = ~Block, residual = ~ar1(Row):idv(Column), data = mydat)
+  # two-dimensional correlation
+  model4 = asreml(Y ~ Genotype, random = ~Block, residual = ~ar1v(Row):ar1(Column), data = mydat)
+  # two-dimensional correlation with nuggets
+  model5 = asreml(Y ~ Genotype, random = ~Block + idv(units), residual = ~ar1v(Row):ar1(Column), data = mydat)
+  # column and row as random effects
+  model6 = asreml(Y ~ Genotype, random = ~Block + Column + Row, residual = ~NULL, data = mydat)
+)
+
+# compare models using AIC and BIC
+sapply(fm,asremlPlus::infoCriteria.asreml)
+
+```
+
+
+## Spatial analysis of field trials with P-splines (SpATS model)
+Recently, a new approach was developed to account for spatial correlations, called `SpATS` [@rodriguez2018correcting]. It uses two-dimensional smooth surfaces to model spatial trends in fields.
+
+$y = f(u,v) + X\beta + Z_{column}c_{column}+Z_{row}c_{row}$ where $f(u,v)$ is the smooth function and $Z_{column}c_{column}+Z_{row}c_{row}$ is the random effects of columns and rows.
+
+`SpATS` uses penalized spline (P-spline) to smooth to model
+
+## Other R package to use?
+* `nlme` and `sommer` can fit AR1 correlation structure, but I am not sure whether they can fit a two-dimensional AR1xAR1 model.
+* `corAR1` function of `nlme` generates an object with classes of "corAR1" and "corStruct". If we want to specify a correlation structure with a given matrix, we need to use `cov2cor` function.
+* `AR1` function of `sommer` can generate a correlation matrix $\Sigma= \begin{bmatrix}1 & &  & & \\\rho & 1 &  & & \\ \rho^2 & \rho & 1 & & \\ \vdots & \vdots & \vdots & \ddots&  \\ \rho_{r-1} & \rho_{r-2} & \rho_{r-3} & \dots &1 \end{bmatrix}$, and `sommer` can accept a correlation matrix like this: `rcov=~vs(AR1(env),units)` (see [here](https://rpubs.com/samuelkn/CovarianceStructuresInR))
+
+https://bbolker.github.io/mixedmodels-misc/notes/corr_braindump.html
+
+
+For a quick comparison of `lme4` and 'nlme', `lme4` is currently fastest but `nlme` is more flexible, allowing users to specify the covariance structure of residuals (For details, please see [GLMM FAQ](https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#should-i-use-aov-nlme-or-lme4-or-some-other-package), written by one of the author of `lme4`).
+
+
+## Reference
